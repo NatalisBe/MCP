@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Extensibilidad con Servidores MCP</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0A0F2C;
-            --accent-color: #F5A623;
-            --text-color: #FFFFFF;
-            --text-muted: #A0A5C0;
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --card-border: rgba(255, 255, 255, 0.1);
+            --bg-dark: #050505;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --accent: #38bdf8;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --font-serif: 'Lora', serif;
+            --font-sans: 'Inter', sans-serif;
         }
 
         * {
@@ -22,716 +24,508 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: var(--font-sans);
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
             overflow-x: hidden;
             line-height: 1.6;
+            font-size: 16px;
         }
 
-        /* Progress Bar */
-        #progress-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 4px;
-            background-color: var(--accent-color);
-            width: 0%;
-            z-index: 1000;
-            transition: width 0.1s ease-out;
-        }
-
-        /* Sections */
-        section {
-            min-height: 100vh;
-            padding: 4rem 2rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Animations */
-        .animate-on-scroll {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-        }
-
-        .animate-on-scroll.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Staggered children */
-        .stagger-1 { transition-delay: 0.1s; }
-        .stagger-2 { transition-delay: 0.2s; }
-        .stagger-3 { transition-delay: 0.3s; }
-        .stagger-4 { transition-delay: 0.4s; }
-
-        h1, h2, h3 {
-            line-height: 1.2;
-            margin-bottom: 1rem;
+        /* Typography */
+        h1, h2, h3, .serif {
+            font-family: var(--font-serif);
+            font-weight: 500;
         }
 
         h1 {
-            font-size: 4rem;
-            font-weight: 800;
-            text-align: center;
-            background: linear-gradient(to right, #fff, var(--accent-color));
+            font-size: clamp(3rem, 6vw, 5rem);
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #fff, #a1a1aa);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         h2 {
-            font-size: 3rem;
-            font-weight: 800;
-            text-align: center;
-            margin-bottom: 3rem;
-            color: var(--accent-color);
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
         }
 
-        .subtitle {
+        h3 {
             font-size: 1.5rem;
-            color: var(--text-muted);
-            text-align: center;
-            max-width: 800px;
-            margin-bottom: 2rem;
+            margin-bottom: 0.5rem;
+            color: #e4e4e7;
         }
 
-        /* Slide 1 - Hero */
-        #hero {
-            text-align: center;
-        }
-        .tag-chip {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            background-color: rgba(245, 166, 35, 0.1);
-            color: var(--accent-color);
-            border: 1px solid var(--accent-color);
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            margin-bottom: 2rem;
-        }
-        .authors {
-            margin-top: 3rem;
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
             font-size: 1.1rem;
-            color: var(--text-muted);
-        }
-        .bg-particles {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            overflow: hidden;
-        }
-        .particle {
-            position: absolute;
-            background-color: var(--accent-color);
-            border-radius: 50%;
-            opacity: 0.3;
-            animation: float 10s infinite linear;
-        }
-        @keyframes float {
-            0% { transform: translateY(0) translateX(0); opacity: 0; }
-            50% { opacity: 0.5; }
-            100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
         }
 
-        /* Grid Layouts */
-        .grid-3 {
+        .tag {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Scroll Sections & Parallax */
+        .section {
+            min-height: 100vh;
+            padding: 6rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .parallax-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            z-index: -1;
+            opacity: 0.4;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.2) 100%);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.2) 100%);
+        }
+
+        .overlay-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, var(--bg-dark));
+            z-index: -1;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2.5rem;
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-5px);
+        }
+
+        /* Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+
+        /* Grids */
+        .grid-2 {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
-            width: 100%;
+            margin-top: 3rem;
         }
-        .grid-4 {
+        
+        .grid-3 {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 2rem;
-            width: 100%;
-        }
-        .split {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            width: 100%;
-            align-items: center;
-        }
-        @media (max-width: 768px) {
-            .split { grid-template-columns: 1fr; gap: 2rem; }
-            h1 { font-size: 2.5rem; }
-            h2 { font-size: 2rem; }
+            margin-top: 3rem;
         }
 
-        /* Cards */
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 2rem;
-            transition: transform 0.3s ease, border-color 0.3s ease;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-color);
-        }
-        .card-number {
-            font-size: 3rem;
-            font-weight: 800;
-            color: var(--accent-color);
-            opacity: 0.5;
-            margin-bottom: 1rem;
-        }
-        .card-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-        .card-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        /* Slide 4 - API Diagram */
-        .diagram-box {
-            background: var(--card-bg);
-            border: 1px solid var(--accent-color);
-            padding: 1.5rem;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 600;
+        /* Timeline for Process */
+        .timeline {
             position: relative;
+            max-width: 800px;
+            margin: 4rem auto 0;
+            padding-left: 2rem;
         }
-        .diagram-arrow {
-            text-align: center;
-            font-size: 2rem;
-            color: var(--accent-color);
-            margin: 1rem 0;
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--glass-border);
         }
-        .example-box {
-            background: rgba(255,255,255,0.05);
-            padding: 1.5rem;
-            border-left: 4px solid var(--accent-color);
-            margin-top: 2rem;
-            font-style: italic;
-        }
-
-        /* Slide 5 - Counters */
-        .stat-box {
-            text-align: center;
+        .timeline-item {
+            position: relative;
             margin-bottom: 3rem;
         }
-        .stat-number {
-            font-size: 5rem;
-            font-weight: 800;
-            color: var(--accent-color);
-            line-height: 1;
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.35rem;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
         }
-        .stat-label {
-            font-size: 1.2rem;
-            color: var(--text-muted);
-            margin-top: 0.5rem;
-        }
-        .comparison-box {
-            margin-bottom: 1.5rem;
-            padding-left: 1.5rem;
-            border-left: 2px solid var(--card-border);
-        }
-        .comparison-box.highlight {
-            border-left-color: var(--accent-color);
+        .timeline-content h3 {
+            color: #fff;
+            margin-bottom: 0.5rem;
         }
 
-        /* Slide 6 - Architecture */
-        .arch-arrow {
+        /* Architecture Diagram */
+        .arch-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+        .arch-node {
             display: flex;
             align-items: center;
-            margin-bottom: 2rem;
+            gap: 1.5rem;
             padding: 1.5rem;
-            border-radius: 8px;
-            width: 100%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
         }
-        .arch-arrow h3 { margin: 0 1rem 0 0; min-width: 120px; }
-        .arch-arrow p { margin: 0; color: var(--text-muted); }
-        .arch-1 { background: rgba(255,255,255,0.05); margin-left: 0; }
-        .arch-2 { background: rgba(255,255,255,0.1); margin-left: 2rem; }
-        .arch-3 { background: rgba(255,255,255,0.15); margin-left: 4rem; border-left: 4px solid var(--accent-color); }
-        @media (max-width: 768px) {
-            .arch-2, .arch-3 { margin-left: 0; }
-            .arch-arrow { flex-direction: column; align-items: flex-start; }
-            .arch-arrow h3 { margin-bottom: 0.5rem; }
-        }
-
-        /* Slide 8 - Bottom Banner */
-        .bottom-banner {
-            margin-top: 4rem;
-            padding: 1.5rem;
-            background: linear-gradient(90deg, rgba(245,166,35,0.1), rgba(245,166,35,0.2));
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 1.2rem;
-            width: 100%;
-            border: 1px solid rgba(245,166,35,0.3);
-        }
-
-        /* Slide 9 - Detailed Cards */
-        .tag {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-            font-size: 0.8rem;
-            margin-bottom: 1rem;
-            color: var(--accent-color);
-        }
-
-        /* Slide 10 - Steps */
-        .step-list {
-            list-style: none;
-            width: 100%;
-            max-width: 800px;
-        }
-        .step-item {
+        .arch-icon {
+            font-size: 2.5rem;
+            background: rgba(255,255,255,0.05);
+            width: 80px;
+            height: 80px;
             display: flex;
-            margin-bottom: 2rem;
-            align-items: flex-start;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            flex-shrink: 0;
         }
-        .step-num {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--accent-color);
-            margin-right: 1.5rem;
-            line-height: 1;
-        }
-        .step-content h3 { margin-bottom: 0.5rem; }
+
+        /* Code Block */
         .code-block {
-            background: #050814;
+            background: #000;
             padding: 1.5rem;
-            border-radius: 8px;
+            border-radius: 12px;
             font-family: monospace;
             color: #a6accd;
             width: 100%;
-            max-width: 800px;
             overflow-x: auto;
-            border: 1px solid var(--card-border);
+            border: 1px solid var(--glass-border);
             margin-top: 2rem;
+            font-size: 0.95rem;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
 
-        /* Slide 11 - Conclusion */
-        .quote {
-            font-size: 2rem;
+        /* Highlight text */
+        .highlight {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .italic-quote {
+            font-family: var(--font-serif);
             font-style: italic;
-            text-align: center;
-            margin-bottom: 4rem;
-            color: var(--accent-color);
-            max-width: 900px;
+            font-size: 1.5rem;
+            color: #e4e4e7;
+            border-left: 3px solid var(--accent);
+            padding-left: 1.5rem;
+            margin: 2rem 0;
         }
-        .takeaways {
-            max-width: 800px;
-            width: 100%;
-        }
-        .takeaway-item {
-            display: flex;
-            margin-bottom: 1.5rem;
-            font-size: 1.2rem;
-        }
-        .takeaway-num {
-            color: var(--accent-color);
-            font-weight: bold;
-            margin-right: 1rem;
-        }
-        footer {
-            margin-top: 5rem;
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            border-top: 1px solid var(--card-border);
-            padding-top: 2rem;
-            width: 100%;
-        }
+
+        .text-center { text-align: center; }
     </style>
 </head>
 <body>
 
-    <div id="progress-bar"></div>
-
-    <!-- SLIDE 1 — HERO -->
-    <section id="slide-1">
-        <div class="bg-particles" id="particles"></div>
-        <div class="animate-on-scroll">
-            <div class="tag-chip">MODEL CONTEXT PROTOCOL</div>
-        </div>
-        <h1 class="animate-on-scroll stagger-1">Extensibilidad con Servidores MCP</h1>
-        <p class="subtitle animate-on-scroll stagger-2">Cómo extender las capacidades de Claude Code integrando servicios externos y automatización de navegadores.</p>
-        <div class="authors animate-on-scroll stagger-3">
-            Sharikc Perez · Natalis Benitez · Valerie Gomez
-        </div>
-    </section>
-
-    <!-- SLIDE 2 — ¿Qué veremos hoy? -->
-    <section id="slide-2">
-        <h2 class="animate-on-scroll">¿Qué veremos hoy?</h2>
-        <div class="grid-3">
-            <div class="card animate-on-scroll stagger-1">
-                <div class="card-number">1</div>
-                <h3 class="card-title">El contexto</h3>
-                <p>El problema de los LLMs aislados y por qué nace MCP.</p>
+    <!-- HERO -->
+    <section class="section">
+        <div class="parallax-bg" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2000&auto=format&fit=crop');"></div>
+        <div class="overlay-gradient"></div>
+        <div class="container text-center">
+            <div class="reveal">
+                <div class="tag">Model Context Protocol</div>
             </div>
-            <div class="card animate-on-scroll stagger-2">
-                <div class="card-number">2</div>
-                <h3 class="card-title">Cómo funciona</h3>
-                <p>Arquitectura cliente-servidor, primitivas y tipos de extensibilidad.</p>
-            </div>
-            <div class="card animate-on-scroll stagger-3">
-                <div class="card-number">3</div>
-                <h3 class="card-title">Demo en vivo</h3>
-                <p>Conectar Claude Code con Playwright y servicios externos.</p>
-            </div>
+            <h1 class="reveal delay-1">Extensibilidad con<br>Servidores MCP</h1>
+            <p class="reveal delay-2" style="font-size: 1.25rem; max-width: 600px; margin: 0 auto 3rem;">
+                Cómo extender las capacidades de Claude Code integrando servicios externos y automatización.
+            </p>
+            <p class="reveal delay-3" style="font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase;">
+                Sharikc Perez • Natalis Benitez • Valerie Gomez
+            </p>
         </div>
     </section>
 
-    <!-- SLIDE 3 — El problema -->
-    <section id="slide-3">
-        <h2 class="animate-on-scroll">El problema: los LLMs están encerrados</h2>
-        <p class="subtitle animate-on-scroll stagger-1">No puede interactuar directamente con sistemas externos.</p>
-        <div class="grid-3">
-            <div class="card animate-on-scroll stagger-2">
-                <div class="card-icon">🗄️</div>
-                <h3 class="card-title">Bases de datos</h3>
-                <p>No puede consultar información en tiempo real.</p>
+    <!-- EL PROBLEMA -->
+    <section class="section">
+        <div class="container">
+            <div class="reveal">
+                <div class="tag">01 · El Contexto</div>
+                <h2>Los LLMs están aislados</h2>
+                <p>Por sí solos, los modelos de lenguaje no pueden interactuar directamente con sistemas externos. No pueden consultar tu base de datos en tiempo real, no pueden ejecutar código fuera de su entorno, y no pueden navegar por internet.</p>
             </div>
-            <div class="card animate-on-scroll stagger-3">
-                <div class="card-icon">⚡</div>
-                <h3 class="card-title">Ejecución externa</h3>
-                <p>No puede ejecutar código fuera de su entorno.</p>
-            </div>
-            <div class="card animate-on-scroll stagger-4">
-                <div class="card-icon">🌐</div>
-                <h3 class="card-title">Internet</h3>
-                <p>No puede navegar por la web por sí solo.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- SLIDE 4 — ¿Qué es una API? -->
-    <section id="slide-4">
-        <h2 class="animate-on-scroll">¿Qué es una API?</h2>
-        <div class="split">
-            <div class="animate-on-scroll stagger-1">
-                <div class="diagram-box">TU APP (CLIENTE)</div>
-                <div class="diagram-arrow">↓</div>
-                <div class="diagram-box" style="border-color: #fff;">API (MESERO)</div>
-                <div class="diagram-arrow">↓</div>
-                <div class="diagram-box">SERVICIO EXTERNO (COCINA)</div>
-            </div>
-            <div class="animate-on-scroll stagger-2">
-                <h3>El mesero es la API</h3>
-                <p>El intermediario que conecta dos sistemas sin que uno tenga que conocer los detalles internos del otro.</p>
-                <div class="example-box">
-                    Una app del clima llama a la API de un servicio meteorológico → obtiene los datos → los muestra. Sin satélites propios.
+            
+            <div class="grid-3">
+                <div class="glass-card reveal delay-1">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">🗄️</div>
+                    <h3>Bases de datos</h3>
+                    <p>Sin acceso a información en tiempo real.</p>
+                </div>
+                <div class="glass-card reveal delay-2">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">⚡</div>
+                    <h3>Ejecución</h3>
+                    <p>Sin capacidad de correr código externo.</p>
+                </div>
+                <div class="glass-card reveal delay-3">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">🌐</div>
+                    <h3>Internet</h3>
+                    <p>Sin poder navegar por la web por sí solos.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- SLIDE 5 — La solución: MCP -->
-    <section id="slide-5">
-        <h2 class="animate-on-scroll">La solución: MCP</h2>
-        <div class="split">
-            <div class="animate-on-scroll stagger-1">
-                <div class="comparison-box">
-                    <h3>Antes del USB</h3>
-                    <p>Cada dispositivo tenía su propio conector. Un caos.</p>
-                </div>
-                <div class="comparison-box">
-                    <h3>USB lo resolvió</h3>
-                    <p>Un estándar universal para todo.</p>
-                </div>
-                <div class="comparison-box highlight">
-                    <h3 style="color: var(--accent-color);">MCP hace lo mismo</h3>
-                    <p>Para la IA. Un protocolo que convierte al modelo en un sistema capaz de actuar.</p>
+    <!-- ARQUITECTURA -->
+    <section class="section">
+        <div class="parallax-bg" style="background-image: url('https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=2000&auto=format&fit=crop'); opacity: 0.15;"></div>
+        <div class="container">
+            <div class="reveal">
+                <div class="tag">02 · Estructura</div>
+                <h2>Arquitectura Cliente-Servidor</h2>
+                <p>MCP funciona sobre un modelo muy común en el desarrollo de software. Hay tres actores principales que hacen posible la magia.</p>
+                
+                <div class="italic-quote">
+                    "MCP actúa como el puente entre la inteligencia artificial y el mundo real."
                 </div>
             </div>
-            <div class="animate-on-scroll stagger-2">
-                <div class="stat-box">
-                    <div class="stat-number" data-target="97" data-suffix="M+">0</div>
-                    <div class="stat-label">Descargas mensuales del SDK</div>
+
+            <div class="arch-container">
+                <div class="arch-node reveal delay-1">
+                    <div class="arch-icon">🤖</div>
+                    <div>
+                        <h3>1. El Cliente</h3>
+                        <p style="margin:0;">En nuestro caso es <strong>Claude Code</strong> — la IA con la que interactúas directamente.</p>
+                    </div>
                 </div>
-                <div class="stat-box">
-                    <div class="stat-number" data-target="10" data-suffix="K+">0</div>
-                    <div class="stat-label">Servidores MCP disponibles</div>
+                <div class="arch-node reveal delay-2">
+                    <div class="arch-icon">🌉</div>
+                    <div>
+                        <h3>2. El Servidor MCP</h3>
+                        <p style="margin:0;">Actúa como el <strong>intermediario inteligente</strong> que traduce las necesidades de la IA.</p>
+                    </div>
+                </div>
+                <div class="arch-node reveal delay-3">
+                    <div class="arch-icon">🛠️</div>
+                    <div>
+                        <h3>3. Las Herramientas</h3>
+                        <p style="margin:0;">Los <strong>servicios externos</strong>: APIs, bases de datos, navegadores, lo que necesites.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- SLIDE 6 — Arquitectura -->
-    <section id="slide-6">
-        <h2 class="animate-on-scroll">Arquitectura cliente-servidor</h2>
-        <p class="subtitle animate-on-scroll stagger-1">MCP actúa como un puente entre la IA y el mundo real.</p>
-        <div style="width: 100%; max-width: 800px; margin-top: 2rem;">
-            <div class="arch-arrow arch-1 animate-on-scroll stagger-2">
-                <h3>→ Host</h3>
-                <p>El Host es la cara visible.</p>
+    <!-- EL PROCESO (Paso a paso) -->
+    <section class="section">
+        <div class="container">
+            <div class="reveal">
+                <div class="tag">03 · Funcionamiento</div>
+                <h2>¿Cómo fluye la información?</h2>
+                <p>El proceso funciona así, y es más simple de lo que parece.</p>
             </div>
-            <div class="arch-arrow arch-2 animate-on-scroll stagger-3">
-                <h3>→ Cliente</h3>
-                <p>El Client habla el idioma de MCP.</p>
+
+            <div class="timeline">
+                <div class="timeline-item reveal delay-1">
+                    <div class="timeline-content">
+                        <h3>1. La Solicitud</h3>
+                        <p>Le haces una petición a Claude Code en lenguaje natural.</p>
+                    </div>
+                </div>
+                <div class="timeline-item reveal delay-2">
+                    <div class="timeline-content">
+                        <h3>2. La Detección</h3>
+                        <p>El modelo detecta que para responder necesita usar una herramienta externa.</p>
+                    </div>
+                </div>
+                <div class="timeline-item reveal delay-3">
+                    <div class="timeline-content">
+                        <h3>3. El Envío</h3>
+                        <p>MCP envía esa solicitud al servidor correspondiente.</p>
+                    </div>
+                </div>
+                <div class="timeline-item reveal delay-1">
+                    <div class="timeline-content">
+                        <h3>4. La Ejecución</h3>
+                        <p>El servidor ejecuta la acción: consulta la API, accede a la base de datos, abre el navegador, lo que sea.</p>
+                    </div>
+                </div>
+                <div class="timeline-item reveal delay-2">
+                    <div class="timeline-content">
+                        <h3>5. La Respuesta</h3>
+                        <p>Devuelve la información directamente al modelo, que te la presenta de forma clara en la conversación.</p>
+                    </div>
+                </div>
             </div>
-            <div class="arch-arrow arch-3 animate-on-scroll stagger-4">
-                <h3 style="color: var(--accent-color);">→ Servidor</h3>
-                <p>El Server expone las capacidades reales al modelo.</p>
+
+            <div class="glass-card reveal delay-3 text-center" style="margin-top: 2rem; padding: 1.5rem;">
+                <p style="margin:0; color: var(--text-primary);">Todo esto ocurre en segundos, de forma automática y completamente transparente para el usuario.</p>
             </div>
         </div>
     </section>
 
-    <!-- SLIDE 7 — Primitivas -->
-    <section id="slide-7">
-        <h2 class="animate-on-scroll">¿Qué puede ofrecer un servidor MCP?</h2>
-        <p class="subtitle animate-on-scroll stagger-1">Un servidor MCP expone tres primitivas:</p>
-        <div class="grid-3">
-            <div class="card animate-on-scroll stagger-2">
-                <div class="card-icon">🔧</div>
-                <h3 class="card-title">Tools</h3>
-                <div class="tag">Controlado por el modelo</div>
-                <p>Funciones ejecutables: buscar en internet, controlar navegador, crear archivos.</p>
+    <!-- ECOSISTEMA MCP -->
+    <section class="section">
+        <div class="parallax-bg" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop'); opacity: 0.15;"></div>
+        <div class="container">
+            <div class="reveal">
+                <div class="tag">04 · Herramientas</div>
+                <h2>El Ecosistema MCP</h2>
+                <p>Ahora viene la parte más interesante. Lo más poderoso de MCP no es solo lo que permite hacer, sino <strong>lo que ya existe disponible hoy</strong>. Hay un ecosistema enorme listo para conectar.</p>
             </div>
-            <div class="card animate-on-scroll stagger-3">
-                <div class="card-icon">🗃️</div>
-                <h3 class="card-title">Resources</h3>
-                <div class="tag">Controlado por la app</div>
-                <p>Fuentes de datos: esquema de una BD, documentos, historial.</p>
-            </div>
-            <div class="card animate-on-scroll stagger-4">
-                <div class="card-icon">📄</div>
-                <h3 class="card-title">Prompts</h3>
-                <div class="tag">Controlado por el usuario</div>
-                <p>Plantillas reutilizables: flujos predefinidos, guías de estilo.</p>
+
+            <div class="grid-2">
+                <div class="glass-card reveal delay-1">
+                    <h3 class="serif">🎭 Playwright MCP</h3>
+                    <p class="highlight">Automatización de navegadores</p>
+                    <p>Le da a Claude la capacidad de controlar un navegador real. No simula clics — los ejecuta de verdad. Puede abrir páginas, hacer scroll, llenar formularios y tomar screenshots.</p>
+                    <p style="font-size: 0.9rem; margin:0;"><em>Ej: "Entra a la plataforma, revisa 20 pedidos y dime cuáles tienen retraso" — sin escribir código.</em></p>
+                </div>
+
+                <div class="glass-card reveal delay-2">
+                    <h3 class="serif">🎨 Figma MCP</h3>
+                    <p class="highlight">De diseño a código, sin fricción</p>
+                    <p>Claude accede a tus archivos y los convierte en código funcional, extrayendo variables y componentes respetando tu sistema de diseño. ¡Incluso puede escribir directamente en el canvas de Figma!</p>
+                </div>
+
+                <div class="glass-card reveal delay-3" style="grid-column: 1 / -1;">
+                    <h3 class="serif">📚 Context7 MCP</h3>
+                    <p class="highlight">Documentación siempre actualizada</p>
+                    <p>Resuelve el problema de la "fecha de corte" de conocimiento de las IAs. Jala la documentación oficial (Next.js, React, etc.) en tiempo real y la inyecta en el contexto antes de que el modelo responda. Evita errores por APIs obsoletas.</p>
+                    <p style="font-size: 0.9rem; margin:0;"><em>Dato: Ya tiene más de 51,000 estrellas en GitHub.</em></p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- SLIDE 8 — Tipos de extensibilidad -->
-    <section id="slide-8">
-        <h2 class="animate-on-scroll">Tipos de extensibilidad</h2>
-        <div class="grid-4">
-            <div class="card animate-on-scroll stagger-1">
-                <div class="card-icon">🔌</div>
-                <h3 class="card-title">APIs externas</h3>
-                <p>Servicios de clima, pagos, redes sociales, cualquier API pública o privada.</p>
+    <!-- LA COMBINACIÓN -->
+    <section class="section" style="min-height: 60vh;">
+        <div class="container text-center">
+            <h2 class="reveal serif" style="font-size: clamp(2rem, 5vw, 4rem);">El Poder de Combinar</h2>
+            <p class="reveal delay-1" style="font-size: 1.25rem; max-width: 800px; margin: 2rem auto;">
+                Y lo más interesante de todo es que puedes combinarlos. Claude puede en una sola instrucción consultar tu base de datos, verificar algo en una página web, generar código que respete tu sistema de diseño de Figma, y hacerlo todo con documentación actualizada gracias a Context7.
+            </p>
+            <div class="glass-card reveal delay-2" style="display: inline-block; padding: 1.5rem 3rem; background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3);">
+                <p style="margin:0; color: #fff; font-weight: 500;">Todo coordinado. Todo automatizado.</p>
             </div>
-            <div class="card animate-on-scroll stagger-2">
-                <div class="card-icon">🗄️</div>
-                <h3 class="card-title">Bases de datos</h3>
-                <p>Consultas en tiempo real, lenguaje natural → SQL.</p>
-            </div>
-            <div class="card animate-on-scroll stagger-3">
-                <div class="card-icon">📁</div>
-                <h3 class="card-title">Sistema de archivos</h3>
-                <p>Leer, escribir, organizar documentos.</p>
-            </div>
-            <div class="card animate-on-scroll stagger-4">
-                <div class="card-icon">🌐</div>
-                <h3 class="card-title">Navegadores web</h3>
-                <p>Automatización, screenshots, testing.</p>
-            </div>
-        </div>
-        <div class="bottom-banner animate-on-scroll stagger-4">
-            Lo más poderoso: puedes combinarlos todos en una sola instrucción.
+            <p class="reveal delay-3" style="margin-top: 3rem; font-size: 1.2rem; color: var(--accent);">
+                Ahora Valerie les va a mostrar en vivo exactamente cómo se ve esto con Playwright.
+            </p>
         </div>
     </section>
 
-    <!-- SLIDE 9 — Servidores destacados -->
-    <section id="slide-9">
-        <h2 class="animate-on-scroll">Servidores MCP destacados</h2>
-        <p class="subtitle animate-on-scroll stagger-1">El ecosistema ya existe. Aquí algunos imprescindibles.</p>
-        <div class="grid-3">
-            <div class="card animate-on-scroll stagger-2">
-                <div class="card-icon">🎭</div>
-                <h3 class="card-title">PLAYWRIGHT MCP</h3>
-                <div class="tag">Automatización de navegadores</div>
-                <p>Le da a Claude control real sobre un navegador: abrir páginas, hacer clic, llenar formularios, tomar screenshots — todo desde lenguaje natural. Es el servidor que veremos en la demo.</p>
+    <!-- DEMO -->
+    <section class="section">
+        <div class="parallax-bg" style="background-image: url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2000&auto=format&fit=crop'); opacity: 0.2;"></div>
+        <div class="container">
+            <div class="reveal">
+                <div class="tag">05 · Demo en vivo</div>
+                <h2>Manos a la obra</h2>
+                <p>Vamos a conectar Claude Code con Playwright para automatizar un navegador en tiempo real.</p>
             </div>
-            <div class="card animate-on-scroll stagger-3">
-                <div class="card-icon">🎨</div>
-                <h3 class="card-title">FIGMA MCP</h3>
-                <div class="tag">Diseño → Código</div>
-                <p>Conecta Claude con tus archivos de Figma para extraer variables, componentes y estilos, y convertirlos en código que ya respeta tu sistema de diseño. También puede escribir directamente en el canvas de Figma. Disponible gratis en beta.</p>
-            </div>
-            <div class="card animate-on-scroll stagger-4">
-                <div class="card-icon">📚</div>
-                <h3 class="card-title">CONTEXT7 MCP</h3>
-                <div class="tag">Documentación siempre actualizada</div>
-                <p>Soluciona el mayor problema del vibe coding: la IA usando docs desactualizadas. Context7 inyecta la documentación oficial y actualizada de cualquier librería justo antes de que Claude responda. Más de 51K ⭐ en GitHub.</p>
-            </div>
-        </div>
-    </section>
 
-    <!-- SLIDE 10 — Demo -->
-    <section id="slide-10">
-        <h2 class="animate-on-scroll">Manos a la obra</h2>
-        <p class="subtitle animate-on-scroll stagger-1">Conectar Claude Code con Playwright — en tiempo real.</p>
-        
-        <ul class="step-list">
-            <li class="step-item animate-on-scroll stagger-2">
-                <div class="step-num">01</div>
-                <div class="step-content">
-                    <h3>Abrir Claude Code</h3>
-                    <p>Sin herramientas externas aún.</p>
+            <div class="grid-2">
+                <div class="reveal delay-1">
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-size: 1.1rem; color: var(--accent);">01. Abrir Claude Code</h3>
+                        <p>Sin herramientas externas. El modelo no puede tocar el navegador todavía.</p>
+                    </div>
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-size: 1.1rem; color: var(--accent);">02. Instalar Playwright MCP</h3>
+                        <p>Un solo comando: <code>npx @playwright/mcp@latest</code></p>
+                    </div>
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-size: 1.1rem; color: var(--accent);">03. Configurar mcp.json</h3>
+                        <p>Agregar el servidor en el archivo de configuración.</p>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1.1rem; color: var(--accent);">04. ¡Probar en vivo!</h3>
+                        <p>Le pedimos a Claude que abra Google y tome un screenshot. Sin código.</p>
+                    </div>
                 </div>
-            </li>
-            <li class="step-item animate-on-scroll stagger-3">
-                <div class="step-num">02</div>
-                <div class="step-content">
-                    <h3>Instalar Playwright MCP</h3>
-                    <p><code>npx @playwright/mcp@latest</code></p>
-                </div>
-            </li>
-            <li class="step-item animate-on-scroll stagger-4">
-                <div class="step-num">03</div>
-                <div class="step-content">
-                    <h3>Configurar mcp.json</h3>
-                    <p>Agregar el servidor en el archivo de config.</p>
-                </div>
-            </li>
-            <li class="step-item animate-on-scroll stagger-4">
-                <div class="step-num">04</div>
-                <div class="step-content">
-                    <h3>¡Probar en vivo!</h3>
-                    <p>Pedirle a Claude que abra Google y tome un screenshot.</p>
-                </div>
-            </li>
-        </ul>
 
-        <div class="code-block animate-on-scroll stagger-4">
-<pre><code>{
+                <div class="reveal delay-2">
+                    <div class="code-block">
+// mcp.json
+{
   "mcpServers": {
     "playwright": {
       "command": "npx",
-      "args": ["@playwright/mcp@latest"]
+      "args": ["-y", "@playwright/mcp@latest"]
     }
   }
-}</code></pre>
+}
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- SLIDE 11 — Conclusión -->
-    <section id="slide-11">
-        <div class="quote animate-on-scroll">
-            "La extensibilidad con servidores MCP representa el futuro de la IA — donde los modelos no solo entienden, sino que también actúan."
+    <!-- CONCLUSION -->
+    <section class="section" style="min-height: 50vh; text-align: center;">
+        <div class="container">
+            <h2 class="reveal serif">En conclusión...</h2>
+            <div class="italic-quote reveal delay-1" style="border: none; padding: 0; font-size: clamp(1.5rem, 3vw, 2.5rem); line-height: 1.4; max-width: 900px; margin: 2rem auto;">
+                "La extensibilidad con servidores MCP representa el futuro de la IA — donde los modelos no solo entienden, sino que también actúan."
+            </div>
+            <p class="reveal delay-2" style="margin-top: 4rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;">
+                ¡Muchas gracias!
+            </p>
         </div>
-        
-        <div class="takeaways">
-            <div class="takeaway-item animate-on-scroll stagger-1">
-                <div class="takeaway-num">1.</div>
-                <div><strong>MCP resuelve el aislamiento de los LLMs</strong> — con un estándar universal que cualquier herramienta puede adoptar.</div>
-            </div>
-            <div class="takeaway-item animate-on-scroll stagger-2">
-                <div class="takeaway-num">2.</div>
-                <div><strong>La instalación toma minutos</strong> — el ecosistema ya tiene más de 10.000 servidores disponibles.</div>
-            </div>
-            <div class="takeaway-item animate-on-scroll stagger-3">
-                <div class="takeaway-num">3.</div>
-                <div><strong>El impacto en productividad es inmediato</strong> — desde el primer comando, el modelo puede actuar en el mundo real.</div>
-            </div>
-        </div>
-
-        <footer class="animate-on-scroll stagger-4">
-            ¡Muchas gracias! · Sharikc Pérez · Natalis Benítez · Valerie Gómez
-        </footer>
     </section>
 
     <script>
-        // Progress Bar
-        window.addEventListener('scroll', () => {
-            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrolled = (winScroll / height) * 100;
-            document.getElementById('progress-bar').style.width = scrolled + '%';
-        });
-
-        // Intersection Observer for Animations
-        const observerOptions = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.15
-        };
-
-        const observer = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    
-                    // Trigger counter animation if it's the stat box
-                    if (entry.target.querySelector('.stat-number')) {
-                        const counters = entry.target.querySelectorAll('.stat-number');
-                        counters.forEach(counter => {
-                            if (!counter.classList.contains('counted')) {
-                                animateCounter(counter);
-                                counter.classList.add('counted');
-                            }
-                        });
-                    }
+        // Scroll Reveal Animation
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
                 }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.animate-on-scroll').forEach(el => {
-            observer.observe(el);
-        });
-
-        // Counter Animation
-        function animateCounter(el) {
-            const target = parseInt(el.getAttribute('data-target'));
-            const suffix = el.getAttribute('data-suffix');
-            const duration = 2000; // 2 seconds
-            const stepTime = Math.abs(Math.floor(duration / target));
-            let current = 0;
-            
-            const timer = setInterval(() => {
-                current += 1;
-                el.innerText = current + suffix;
-                if (current >= target) {
-                    clearInterval(timer);
-                    el.innerText = target + suffix;
-                }
-            }, stepTime);
-        }
-
-        // Particle Background
-        function createParticles() {
-            const container = document.getElementById('particles');
-            const particleCount = 30;
-            
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                
-                // Random properties
-                const size = Math.random() * 5 + 2;
-                const left = Math.random() * 100;
-                const top = Math.random() * 100 + 100; // Start below screen
-                const duration = Math.random() * 10 + 10;
-                const delay = Math.random() * 10;
-                
-                particle.style.width = `${size}px`;
-                particle.style.height = `${size}px`;
-                particle.style.left = `${left}%`;
-                particle.style.top = `${top}%`;
-                particle.style.animationDuration = `${duration}s`;
-                particle.style.animationDelay = `${delay}s`;
-                
-                container.appendChild(particle);
             }
         }
-        
-        createParticles();
+        window.addEventListener("scroll", reveal);
+        reveal(); // Trigger on load
     </script>
 </body>
 </html>
-
