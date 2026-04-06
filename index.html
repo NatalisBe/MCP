@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Extensibilidad con Servidores MCP</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+    <!-- Fuentes más estéticas y elegantes -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-dark: #050505;
@@ -13,8 +14,8 @@
             --accent: #38bdf8;
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --font-serif: 'Lora', serif;
-            --font-sans: 'Inter', sans-serif;
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
         }
 
         * {
@@ -121,7 +122,7 @@
             z-index: -1;
         }
 
-        /* Glassmorphism Cards */
+        /* Glassmorphism Cards (Interactive) */
         .glass-card {
             background: var(--glass-bg);
             backdrop-filter: blur(16px);
@@ -129,12 +130,39 @@
             border: 1px solid var(--glass-border);
             border-radius: 16px;
             padding: 2.5rem;
-            transition: transform 0.3s ease, background 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+            transform: skewX(-25deg);
+            transition: all 0.7s ease;
+        }
+
+        .glass-card:hover::before {
+            left: 200%;
         }
 
         .glass-card:hover {
-            background: rgba(255, 255, 255, 0.05);
-            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(56, 189, 248, 0.2);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+
+        .icon-container {
+            transition: transform 0.4s ease;
+            display: inline-block;
+        }
+
+        .glass-card:hover .icon-container {
+            transform: scale(1.2) rotate(5deg);
         }
 
         /* Animations */
@@ -171,35 +199,67 @@
             position: relative;
             max-width: 800px;
             margin: 4rem auto 0;
-            padding-left: 2rem;
+            padding-left: 3rem;
         }
         .timeline::before {
             content: '';
             position: absolute;
-            left: 0;
+            left: 5px;
             top: 0;
             bottom: 0;
             width: 2px;
             background: var(--glass-border);
         }
+        .timeline-progress {
+            position: absolute;
+            left: 5px;
+            top: 0;
+            width: 2px;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+            transition: height 0.3s ease;
+            z-index: 1;
+        }
         .timeline-item {
             position: relative;
-            margin-bottom: 3rem;
+            margin-bottom: 4rem;
+            opacity: 0.3;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            transform: translateX(-20px);
         }
         .timeline-item::before {
             content: '';
             position: absolute;
-            left: -2.35rem;
+            left: -3.35rem;
             top: 0.5rem;
-            width: 12px;
-            height: 12px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
+            background: var(--bg-dark);
+            border: 2px solid var(--glass-border);
+            box-shadow: none;
+            transition: all 0.5s ease;
+            z-index: 2;
+        }
+        /* Clase que se activa con JS al hacer scroll */
+        .timeline-item.lit {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .timeline-item.lit::before {
             background: var(--accent);
-            box-shadow: 0 0 10px var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent);
+            transform: scale(1.2);
         }
         .timeline-content h3 {
             color: #fff;
             margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+            font-size: 1.8rem;
+        }
+        .timeline-item.lit .timeline-content h3 {
+            color: var(--accent);
         }
 
         /* Architecture Diagram */
@@ -217,6 +277,14 @@
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             border-radius: 12px;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .arch-node:hover {
+            transform: translateX(15px);
+            border-color: rgba(56, 189, 248, 0.4);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            background: rgba(255, 255, 255, 0.06);
         }
         .arch-icon {
             font-size: 2.5rem;
@@ -228,6 +296,10 @@
             justify-content: center;
             border-radius: 50%;
             flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+        .arch-node:hover .arch-icon {
+            transform: scale(1.1) rotate(5deg);
         }
 
         /* Code Block */
@@ -248,7 +320,7 @@
         /* Highlight text */
         .highlight {
             color: var(--text-primary);
-            font-weight: 500;
+            font-weight: 600;
         }
         
         .italic-quote {
@@ -295,18 +367,18 @@
             
             <div class="grid-3">
                 <div class="glass-card reveal delay-1">
-                    <div style="font-size: 2rem; margin-bottom: 1rem;">🗄️</div>
-                    <h3>Bases de datos</h3>
+                    <div class="icon-container" style="font-size: 2.5rem; margin-bottom: 1rem;">🗄️</div>
+                    <h3 class="serif">Bases de datos</h3>
                     <p>Sin acceso a información en tiempo real.</p>
                 </div>
                 <div class="glass-card reveal delay-2">
-                    <div style="font-size: 2rem; margin-bottom: 1rem;">⚡</div>
-                    <h3>Ejecución</h3>
+                    <div class="icon-container" style="font-size: 2.5rem; margin-bottom: 1rem;">⚡</div>
+                    <h3 class="serif">Ejecución</h3>
                     <p>Sin capacidad de correr código externo.</p>
                 </div>
                 <div class="glass-card reveal delay-3">
-                    <div style="font-size: 2rem; margin-bottom: 1rem;">🌐</div>
-                    <h3>Internet</h3>
+                    <div class="icon-container" style="font-size: 2.5rem; margin-bottom: 1rem;">🌐</div>
+                    <h3 class="serif">Internet</h3>
                     <p>Sin poder navegar por la web por sí solos.</p>
                 </div>
             </div>
@@ -324,15 +396,19 @@
 
             <div class="grid-2">
                 <div class="glass-card reveal delay-1">
-                    <div style="font-size: 2.5rem; margin-bottom: 1rem;">🍽️</div>
+                    <div class="icon-container" style="font-size: 3rem; margin-bottom: 1rem;">🍽️</div>
                     <h3 class="serif">La analogía del restaurante</h3>
                     <p>No entras a la cocina a preparar tu comida. Le pides al <strong>mesero (la API)</strong> lo que quieres, él va a la cocina y te trae el resultado. Es el intermediario perfecto.</p>
                 </div>
                 <div class="glass-card reveal delay-2">
-                    <div style="font-size: 2.5rem; margin-bottom: 1rem;">⛅</div>
+                    <div class="icon-container" style="font-size: 3rem; margin-bottom: 1rem;">⛅</div>
                     <h3 class="serif">El ejemplo del clima</h3>
                     <p>Una app del clima no tiene satélites propios. Llama a la <strong>API de un servicio meteorológico</strong>, pide los datos y te los muestra. Simple y poderoso.</p>
                 </div>
+            </div>
+
+            <div class="glass-card reveal delay-3 text-center" style="margin-top: 3rem; padding: 2rem; background: rgba(56, 189, 248, 0.05); border-color: rgba(56, 189, 248, 0.2);">
+                <h3 class="serif" style="color: var(--accent); margin: 0; font-size: 1.5rem;">"MCP convierte a la IA en un sistema capaz de actuar, no solo de responder."</h3>
             </div>
         </div>
     </section>
@@ -348,7 +424,7 @@
             </div>
 
             <div class="glass-card reveal delay-1" style="margin-top: 3rem; display: flex; align-items: center; gap: 2.5rem; flex-wrap: wrap;">
-                <div style="font-size: 4rem; flex-shrink: 0; background: rgba(255,255,255,0.05); width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">🔌</div>
+                <div class="icon-container" style="font-size: 4rem; flex-shrink: 0; background: rgba(255,255,255,0.05); width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">🔌</div>
                 <div style="flex: 1; min-width: 250px;">
                     <h3 class="serif">Un protocolo abierto universal</h3>
                     <p style="margin: 0;">MCP permite conectar modelos de inteligencia artificial con herramientas externas de forma estandarizada: <strong>APIs, bases de datos, navegadores, sistemas de archivos, y mucho más.</strong></p>
@@ -380,21 +456,21 @@
                 <div class="arch-node reveal delay-1">
                     <div class="arch-icon">🤖</div>
                     <div>
-                        <h3>1. El Cliente</h3>
+                        <h3 class="serif">1. El Cliente</h3>
                         <p style="margin:0;">En nuestro caso es <strong>Claude Code</strong> — la IA con la que interactúas directamente.</p>
                     </div>
                 </div>
                 <div class="arch-node reveal delay-2">
                     <div class="arch-icon">🌉</div>
                     <div>
-                        <h3>2. El Servidor MCP</h3>
+                        <h3 class="serif">2. El Servidor MCP</h3>
                         <p style="margin:0;">Actúa como el <strong>intermediario inteligente</strong> que traduce las necesidades de la IA.</p>
                     </div>
                 </div>
                 <div class="arch-node reveal delay-3">
                     <div class="arch-icon">🛠️</div>
                     <div>
-                        <h3>3. Las Herramientas</h3>
+                        <h3 class="serif">3. Las Herramientas</h3>
                         <p style="margin:0;">Los <strong>servicios externos</strong>: APIs, bases de datos, navegadores, lo que necesites.</p>
                     </div>
                 </div>
@@ -411,41 +487,69 @@
                 <p>El proceso funciona así, y es más simple de lo que parece.</p>
             </div>
 
-            <div class="timeline">
+            <div class="timeline" id="timeline">
+                <div class="timeline-progress" id="timeline-progress"></div>
+                
                 <div class="timeline-item reveal delay-1">
                     <div class="timeline-content">
-                        <h3>1. La Solicitud</h3>
-                        <p>Le haces una petición a Claude Code en lenguaje natural.</p>
+                        <h3 class="serif">1. Solicitud</h3>
+                        <p>Petición en lenguaje natural.</p>
                     </div>
                 </div>
                 <div class="timeline-item reveal delay-2">
                     <div class="timeline-content">
-                        <h3>2. La Detección</h3>
-                        <p>El modelo detecta que para responder necesita usar una herramienta externa.</p>
+                        <h3 class="serif">2. Detección</h3>
+                        <p>El modelo identifica la herramienta necesaria.</p>
                     </div>
                 </div>
                 <div class="timeline-item reveal delay-3">
                     <div class="timeline-content">
-                        <h3>3. El Envío</h3>
-                        <p>MCP envía esa solicitud al servidor correspondiente.</p>
+                        <h3 class="serif">3. Envío</h3>
+                        <p>MCP enruta la solicitud al servidor.</p>
                     </div>
                 </div>
                 <div class="timeline-item reveal delay-1">
                     <div class="timeline-content">
-                        <h3>4. La Ejecución</h3>
-                        <p>El servidor ejecuta la acción: consulta la API, accede a la base de datos, abre el navegador, lo que sea.</p>
+                        <h3 class="serif">4. Ejecución</h3>
+                        <p>El servidor realiza la acción.</p>
                     </div>
                 </div>
                 <div class="timeline-item reveal delay-2">
                     <div class="timeline-content">
-                        <h3>5. La Respuesta</h3>
-                        <p>Devuelve la información directamente al modelo, que te la presenta de forma clara en la conversación.</p>
+                        <h3 class="serif">5. Respuesta</h3>
+                        <p>El modelo recibe los datos y responde.</p>
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div class="glass-card reveal delay-3 text-center" style="margin-top: 2rem; padding: 1.5rem;">
-                <p style="margin:0; color: var(--text-primary);">Todo esto ocurre en segundos, de forma automática y completamente transparente para el usuario.</p>
+    <!-- CAPACIDADES -->
+    <section class="section">
+        <div class="parallax-bg" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2000&auto=format&fit=crop'); opacity: 0.15;"></div>
+        <div class="container">
+            <div class="reveal">
+                <div class="tag">06 · Capacidades</div>
+                <h2>¿Qué puede ofrecer un servidor MCP?</h2>
+                <p>Un servidor MCP dota al modelo de tres superpoderes fundamentales:</p>
+            </div>
+
+            <div class="grid-3">
+                <div class="glass-card reveal delay-1">
+                    <div class="icon-container" style="font-size: 3rem; margin-bottom: 1rem;">🛠️</div>
+                    <h3 class="serif">1. Acceso a Herramientas</h3>
+                    <p>Conexión a APIs externas, servicios de pago, redes sociales y cualquier sistema interactivo.</p>
+                </div>
+                <div class="glass-card reveal delay-2">
+                    <div class="icon-container" style="font-size: 3rem; margin-bottom: 1rem;">⚡</div>
+                    <h3 class="serif">2. Ejecución de Acciones</h3>
+                    <p>Capacidad para correr código, automatizar procesos complejos y controlar navegadores web.</p>
+                </div>
+                <div class="glass-card reveal delay-3">
+                    <div class="icon-container" style="font-size: 3rem; margin-bottom: 1rem;">🧠</div>
+                    <h3 class="serif">3. Provisión de Contexto</h3>
+                    <p>Inyección de datos dinámicos y actualizados (estado de una BD o contenido web en tiempo real).</p>
+                </div>
             </div>
         </div>
     </section>
@@ -455,30 +559,30 @@
         <div class="parallax-bg" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop'); opacity: 0.15;"></div>
         <div class="container">
             <div class="reveal">
-                <div class="tag">06 · Herramientas</div>
-                <h2>El Ecosistema MCP</h2>
-                <p>Ahora viene la parte más interesante. Lo más poderoso de MCP no es solo lo que permite hacer, sino <strong>lo que ya existe disponible hoy</strong>. Hay un ecosistema enorme listo para conectar.</p>
+                <div class="tag">07 · Herramientas</div>
+                <h2>Algunos tipos de MCP y sus funciones</h2>
             </div>
 
-            <div class="grid-2">
+            <div class="grid-3" style="gap: 1.5rem; margin-top: 2rem;">
                 <div class="glass-card reveal delay-1">
-                    <h3 class="serif">🎭 Playwright MCP</h3>
+                    <div class="icon-container" style="font-size: 2.5rem; margin-bottom: 1rem;">🎭</div>
+                    <h3 class="serif">Playwright MCP</h3>
                     <p class="highlight">Automatización de navegadores</p>
-                    <p>Le da a Claude la capacidad de controlar un navegador real. No simula clics — los ejecuta de verdad. Puede abrir páginas, hacer scroll, llenar formularios y tomar screenshots.</p>
-                    <p style="font-size: 0.9rem; margin:0;"><em>Ej: "Entra a la plataforma, revisa 20 pedidos y dime cuáles tienen retraso" — sin escribir código.</em></p>
+                    <p>Controla un navegador real. Abre páginas, hace scroll, llena formularios y toma screenshots. Todo ejecutado de verdad, sin simulaciones.</p>
                 </div>
 
                 <div class="glass-card reveal delay-2">
-                    <h3 class="serif">🎨 Figma MCP</h3>
-                    <p class="highlight">De diseño a código, sin fricción</p>
-                    <p>Claude accede a tus archivos y los convierte en código funcional, extrayendo variables y componentes respetando tu sistema de diseño. ¡Incluso puede escribir directamente en el canvas de Figma!</p>
+                    <div class="icon-container" style="font-size: 2.5rem; margin-bottom: 1rem;">🎨</div>
+                    <h3 class="serif">Figma MCP</h3>
+                    <p class="highlight">De diseño a código</p>
+                    <p>Accede a tus diseños y los convierte en código funcional. Extrae variables y componentes respetando tu sistema de diseño, e incluso escribe en el canvas.</p>
                 </div>
 
-                <div class="glass-card reveal delay-3" style="grid-column: 1 / -1;">
-                    <h3 class="serif">📚 Context7 MCP</h3>
-                    <p class="highlight">Documentación siempre actualizada</p>
-                    <p>Resuelve el problema de la "fecha de corte" de conocimiento de las IAs. Jala la documentación oficial (Next.js, React, etc.) en tiempo real y la inyecta en el contexto antes de que el modelo responda. Evita errores por APIs obsoletas.</p>
-                    <p style="font-size: 0.9rem; margin:0;"><em>Dato: Ya tiene más de 51,000 estrellas en GitHub.</em></p>
+                <div class="glass-card reveal delay-3">
+                    <div class="icon-container" style="font-size: 2.5rem; margin-bottom: 1rem;">📚</div>
+                    <h3 class="serif">Context7 MCP</h3>
+                    <p class="highlight">Documentación actualizada</p>
+                    <p>Inyecta documentación oficial en tiempo real (Next.js, React, etc.) al modelo, evitando errores por APIs obsoletas.</p>
                 </div>
             </div>
         </div>
@@ -505,7 +609,7 @@
         <div class="parallax-bg" style="background-image: url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2000&auto=format&fit=crop'); opacity: 0.2;"></div>
         <div class="container">
             <div class="reveal">
-                <div class="tag">07 · Demo en vivo</div>
+                <div class="tag">08 · Demo en vivo</div>
                 <h2>Manos a la obra</h2>
                 <p>Vamos a conectar Claude Code con Playwright para automatizar un navegador en tiempo real.</p>
             </div>
@@ -513,19 +617,19 @@
             <div class="grid-2">
                 <div class="reveal delay-1">
                     <div style="margin-bottom: 2rem;">
-                        <h3 style="font-size: 1.1rem; color: var(--accent);">01. Abrir Claude Code</h3>
+                        <h3 class="serif" style="font-size: 1.3rem; color: var(--accent);">01. Abrir Claude Code</h3>
                         <p>Sin herramientas externas. El modelo no puede tocar el navegador todavía.</p>
                     </div>
                     <div style="margin-bottom: 2rem;">
-                        <h3 style="font-size: 1.1rem; color: var(--accent);">02. Instalar Playwright MCP</h3>
+                        <h3 class="serif" style="font-size: 1.3rem; color: var(--accent);">02. Instalar Playwright MCP</h3>
                         <p>Un solo comando: <code>npx @playwright/mcp@latest</code></p>
                     </div>
                     <div style="margin-bottom: 2rem;">
-                        <h3 style="font-size: 1.1rem; color: var(--accent);">03. Configurar mcp.json</h3>
+                        <h3 class="serif" style="font-size: 1.3rem; color: var(--accent);">03. Configurar mcp.json</h3>
                         <p>Agregar el servidor en el archivo de configuración.</p>
                     </div>
                     <div>
-                        <h3 style="font-size: 1.1rem; color: var(--accent);">04. ¡Probar en vivo!</h3>
+                        <h3 class="serif" style="font-size: 1.3rem; color: var(--accent);">04. ¡Probar en vivo!</h3>
                         <p>Le pedimos a Claude que abra Google y tome un screenshot. Sin código.</p>
                     </div>
                 </div>
@@ -573,8 +677,44 @@
                 }
             }
         }
-        window.addEventListener("scroll", reveal);
-        reveal(); // Trigger on load
+
+        // Timeline lighting up animation
+        function lightUpTimeline() {
+            var items = document.querySelectorAll(".timeline-item");
+            var timeline = document.getElementById("timeline");
+            var progress = document.getElementById("timeline-progress");
+            
+            if(!timeline) return;
+
+            var windowHeight = window.innerHeight;
+            var timelineRect = timeline.getBoundingClientRect();
+            var timelineTop = timelineRect.top;
+            var timelineHeight = timelineRect.height;
+            
+            // Calculate progress line height
+            var scrollPosition = (windowHeight / 1.5) - timelineTop;
+            var percentage = Math.max(0, Math.min(100, (scrollPosition / timelineHeight) * 100));
+            progress.style.height = percentage + "%";
+
+            for (var i = 0; i < items.length; i++) {
+                var elementTop = items[i].getBoundingClientRect().top;
+                var elementVisible = windowHeight / 1.5; // Trigger point
+                if (elementTop < elementVisible) {
+                    items[i].classList.add("lit");
+                } else {
+                    items[i].classList.remove("lit");
+                }
+            }
+        }
+
+        window.addEventListener("scroll", () => {
+            reveal();
+            lightUpTimeline();
+        });
+        
+        // Trigger on load
+        reveal(); 
+        lightUpTimeline();
     </script>
 </body>
 </html>
